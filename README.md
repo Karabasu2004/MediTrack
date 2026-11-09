@@ -619,6 +619,26 @@ server, `npm run android` when an Android device/emulator is available,
 `npm run typecheck` for the TypeScript check, and `npx expo lint` for
 linting. SMS and production alarm scheduling are not implemented.
 
+### Build an installable Android APK
+
+The APK is built with Expo Application Services (EAS), not with Expo Go.
+The free Expo plan can be used subject to its build limits.
+
+1. Create/sign in to a free Expo account at https://expo.dev/.
+2. From this project folder, run `npx eas-cli@latest login` and then
+   `npx eas-cli@latest build:configure`. Link or create an Expo project
+   when prompted.
+3. In the Expo dashboard, add the four `EXPO_PUBLIC_FIREBASE_*` values
+   from the local `.env` to the project's **preview** environment. Never
+   upload `.env` to GitHub.
+4. Run `npx eas-cli@latest build --platform android --profile preview`.
+   The configured `preview` profile produces an installable APK.
+5. Download the APK from the build page and install it on Android.
+
+This installs the standalone app; Expo Go is not required at runtime.
+Android may ask the user to allow app installation from the browser or
+file manager used to download the APK.
+
 ### Configure Firebase Authentication (Milestone 3)
 
 1. Create or choose a project in the [Firebase Console](https://console.firebase.google.com/).
