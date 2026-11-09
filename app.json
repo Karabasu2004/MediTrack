@@ -7,7 +7,10 @@
     "scheme": "meditrack",
     "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "light",
-    "plugins": ["expo-router", "expo-notifications"],
+    "plugins": [
+      "expo-router",
+      "expo-notifications"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -26,6 +29,17 @@
     },
     "experiments": {
       "typedRoutes": false
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "0e5f39ea-62e0-4cb0-b5b6-3cef8eee2a87"
+      }
+    },
+    "owner": "karabasappa"
   }
 }
