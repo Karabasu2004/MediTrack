@@ -1,0 +1,93 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function ownsUserData(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function validMedicine() {
+      let data = request.resource.data;
+      return data.keys().hasAll([
+          'name',
+          'doseDescription',
+          'notes',
+          'startDate',
+          'endDate',
+          'reminderTimes',
+          'active'
+        ])
+        && data.keys().hasOnly([
+          'name',
+          'doseDescription',
+          'notes',
+          'startDate',
+          'endDate',
+          'reminderTimes',
+          'active'
+        ])
+        && data.name is string
+        && data.name.size() > 0
+        && data.name.size() <= 120
+        && data.doseDescription is string
+        && data.doseDescription.size() <= 200
+        && data.notes is string
+        && data.notes.size() <= 2000
+        && data.startDate is string
+        && data.startDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && data.endDate is string
+        && data.endDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && data.reminderTimes is list
+        && data.reminderTimes.size() > 0
+        && data.reminderTimes.size() <= 24
+        && data.active is bool;
+    }
+
+    function validDoseRecord() {
+      let data = request.resource.data;
+      return data.keys().hasAll([
+          'medicineId',
+          'medicineName',
+          'doseDescription',
+          'scheduledDate',
+          'scheduledTime',
+          'status',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'medicineId',
+          'medicineName',
+          'doseDescription',
+          'scheduledDate',
+          'scheduledTime',
+          'status',
+          'updatedAt'
+        ])
+        && data.medicineId is string
+        && data.medicineName is string
+        && data.medicineName.size() > 0
+        && data.medicineName.size() <= 120
+        && data.doseDescription is string
+        && data.doseDescription.size() <= 200
+        && data.scheduledDate is string
+        && data.scheduledDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && data.scheduledTime is string
+        && data.scheduledTime.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+        && data.status in ['taken', 'skipped', 'missed']
+        && data.updatedAt is timestamp
+        && data.updatedAt == request.time;
+    }
+
+    match /users/{userId}/medicines/{medicineId} {
+      allow read: if ownsUserData(userId);
+      allow create, update: if ownsUserData(userId) && validMedicine();
+      allow delete: if ownsUserData(userId);
+    }
+
+    match /users/{userId}/doses/{doseId} {
+      allow read: if ownsUserData(userId);
+      allow create, update: if ownsUserData(userId) && validDoseRecord();
+      allow delete: if ownsUserData(userId);
+    }
+  }
+}
